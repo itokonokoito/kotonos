@@ -7,6 +7,7 @@ let hintLevel = 0;
 let isCompleted = false;
 let moveCount = 0;
 
+const tileSizeSlider = document.getElementById("tileSizeSlider");
 const hint1Input = document.getElementById("hint1Input");
 const hint2Input = document.getElementById("hint2Input");
 const hint3Input = document.getElementById("hint3Input");
@@ -272,6 +273,12 @@ function getProgressPercent() {
     return Math.floor((correctCount / totalCount) * 100);
 }
 
+function updateTileSize() {
+    const size = tileSizeSlider.value;
+
+    document.documentElement.style.setProperty("--tile-size", `${size}px`);
+    document.documentElement.style.setProperty("--tile-font-size", `${Math.floor(size * 0.45)}px`);
+}
 
 function updatePuzzleInfo() {
     const modeNames = {
@@ -631,6 +638,10 @@ lockButton.addEventListener("click", () => {
     renderBlocks();
 });
 
+tileSizeSlider.addEventListener("input", () => {
+    updateTileSize();
+});
+
 hintButton.addEventListener("click", () => {
     const availableHints = hints.filter((hint) => hint !== "");
 
@@ -692,5 +703,7 @@ if (q) {
     }
 }
 
+
 blocks = shuffleArray(createBlocksFromAnswer(answer));
+updateTileSize();
 renderBlocks();
