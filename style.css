@@ -58,13 +58,13 @@ body {
 }
 
 .tile {
+    width: var(--tile-size, 80px);
     min-width: var(--tile-size, 80px);
     height: var(--tile-size, 80px);
 
-    padding: 0 22px;
+    padding: 0;
 
     background: #444;
-
     border-radius: 12px;
 
     display: flex;
@@ -77,7 +77,10 @@ body {
     user-select: none;
 
     transition: transform 0.15s ease,
-                background 0.15s ease;
+                background 0.15s ease,
+                width 0.15s ease,
+                height 0.15s ease,
+                font-size 0.15s ease;
 }
 
 .tile.selected {
@@ -268,9 +271,12 @@ input {
     }
 
      .tile {
+        width: var(--tile-size, 52px);
         min-width: var(--tile-size, 52px);
         height: var(--tile-size, 52px);
-        padding: 0 calc(var(--tile-size, 52px) * 0.25);
+
+        padding: 0;
+
         font-size: var(--tile-font-size, 26px);
         border-radius: 10px;
     }
