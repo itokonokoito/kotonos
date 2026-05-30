@@ -267,17 +267,17 @@ input {
         max-width: 100%;
     }
 
-    .tile {
-        min-width: 44px;
-        height: 52px;
-        padding: 0 12px;
-        font-size: 26px;
+     .tile {
+        min-width: var(--tile-size, 52px);
+        height: var(--tile-size, 52px);
+        padding: 0 calc(var(--tile-size, 52px) * 0.25);
+        font-size: var(--tile-font-size, 26px);
         border-radius: 10px;
     }
 
     .drop-zone {
         width: 8px;
-        height: 52px;
+        height: var(--tile-size, 52px);
     }
 
     .drop-zone::before {
