@@ -58,11 +58,10 @@ body {
 }
 
 .tile {
-    width: var(--tile-size, 80px);
     min-width: var(--tile-size, 80px);
     height: var(--tile-size, 80px);
 
-    padding: 0;
+    padding: 0 20px;
 
     background: #444;
     border-radius: 12px;
@@ -76,11 +75,14 @@ body {
     cursor: pointer;
     user-select: none;
 
-    transition: transform 0.15s ease,
-                background 0.15s ease,
-                width 0.15s ease,
-                height 0.15s ease,
-                font-size 0.15s ease;
+    white-space: nowrap;
+
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease,
+        width 0.15s ease,
+        height 0.15s ease,
+        font-size 0.15s ease;
 }
 
 .tile.selected {
@@ -95,12 +97,51 @@ body {
 
 .tile.manual {
     background: #6a5a44;
-    outline: 2px dashed rgba(255,255,255,0.45);
+    outline: 2px dashed rgba(255, 255, 255, 0.45);
 }
 
 .tile.correct {
+    position: relative;
+
     background: #445a6a !important;
     outline: 2px solid rgba(160, 220, 255, 0.7) !important;
+}
+
+.tile.correct::before {
+    content: "";
+
+    position: absolute;
+
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+
+    border-radius: 12px;
+
+    border: 5px dashed #ff4040;
+
+    box-sizing: border-box;
+
+    pointer-events: none;
+
+    box-shadow:
+        0 0 4px rgba(255, 80, 80, .8),
+        0 0 10px rgba(255, 80, 80, .4);
+
+    animation: threadAppear 0.4s ease-out forwards;
+}
+
+@keyframes threadAppear {
+    from {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .tile.complete {
@@ -170,6 +211,7 @@ body {
     background: rgba(255, 255, 255, 0.8);
     height: 56px;
 }
+
 .drop-zone.movable::before {
     background: rgba(120, 200, 255, 0.7);
 }
@@ -179,6 +221,7 @@ body {
     font-size: 18px;
     opacity: 0.8;
 }
+
 .action-buttons,
 .share-buttons {
     display: flex;
@@ -270,7 +313,7 @@ input {
         max-width: 100%;
     }
 
-     .tile {
+    .tile {
         width: var(--tile-size, 52px);
         min-width: var(--tile-size, 52px);
         height: var(--tile-size, 52px);
