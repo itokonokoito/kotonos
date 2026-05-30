@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コトノス</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>コトノス</h1>
+
+    <div id="setup">
+        <input id="answerInput" type="text" placeholder="お題を入力">
+
+        <div class="hint-inputs">
+            <input id="hint1Input" type="text" placeholder="ヒント1（任意）">
+            <input id="hint2Input" type="text" placeholder="ヒント2（任意）">
+            <input id="hint3Input" type="text" placeholder="ヒント3（任意）">
+        </div>
+
+        <select id="difficultySelect">
+            <option value="easy">つむぎ：自動で結合</option>
+            <option value="normal" selected>ふつう：判定で結合</option>
+            <option value="hard">つぐむ：結合なし</option>
+        </select>
+
+        <button id="startButton">問題開始</button>
+
+        <div class="share-buttons">
+            <button id="shareButton">共有URLを作る</button>
+            <button id="copyButton">URLをコピー</button>
+        </div>
+
+        <input id="shareUrl" type="text" readonly placeholder="共有URLがここに出る">
+    </div>
+
+    <div id="puzzleInfo"></div>
+
+    <div class="hint-area">
+        <button id="hintButton">ヒントを見る</button>
+        <div id="hintText"></div>
+    </div>
+
+    <div id="letters"></div>
+
+    <div class="action-buttons">
+        <button id="manualMergeButton">つむぐ</button>
+        <button id="splitButton">ほどく</button>
+        <button id="lockButton">ロック/解除</button>
+        <button id="checkButton">判定</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
