@@ -58,17 +58,19 @@ body {
 }
 
 .tile {
+    box-sizing: border-box;
+
     min-width: var(--tile-size, 80px);
     max-width: min(90vw, 900px);
 
     min-height: var(--tile-size, 80px);
     height: auto;
 
-    padding: 0 20px;
+    padding: 10px 20px;
 
-    white-space: normal;
+    white-space: normal !important;
     overflow-wrap: anywhere;
-    word-break: break-word;
+    word-break: break-all;
 
     background: #444;
     border-radius: 12px;
@@ -326,11 +328,19 @@ input {
     }
 
     .tile {
-        width: var(--tile-size, 52px);
-        min-width: var(--tile-size, 52px);
-        height: var(--tile-size, 52px);
+        box-sizing: border-box;
 
-        padding: 0;
+        min-width: var(--tile-size, 52px);
+        max-width: 90vw;
+
+        min-height: var(--tile-size, 52px);
+        height: auto;
+
+        padding: 8px 12px;
+
+        white-space: normal !important;
+        overflow-wrap: anywhere;
+        word-break: break-all;
 
         font-size: var(--tile-font-size, 26px);
         border-radius: 10px;
