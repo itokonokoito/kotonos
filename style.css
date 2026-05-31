@@ -61,7 +61,8 @@ body {
     min-width: var(--tile-size, 80px);
     max-width: min(90vw, 900px);
 
-    height: var(--tile-size, 80px);
+    min-height: var(--tile-size, 80px);
+    height: auto;
 
     padding: 0 20px;
 
@@ -81,7 +82,6 @@ body {
     cursor: pointer;
     user-select: none;
 
-    white-space: nowrap;
     line-height: 1.2;
     text-align: center;
 
@@ -92,7 +92,6 @@ body {
         height 0.15s ease,
         font-size 0.15s ease;
 }
-
 .tile.selected {
     outline: 4px solid white;
     transform: translateY(-8px);
