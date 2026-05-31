@@ -107,7 +107,7 @@ body {
     outline: 2px solid rgba(160, 220, 255, 0.7) !important;
 }
 
-.tile.correct::before {
+.tile.just-correct::before {
     content: "";
 
     position: absolute;
@@ -129,7 +129,18 @@ body {
         0 0 4px rgba(255, 80, 80, .8),
         0 0 10px rgba(255, 80, 80, .4);
 
-    animation: threadAppear 0.4s ease-out forwards;
+    animation:
+        threadAppear 0.25s ease-out,
+        threadFade 0.35s ease-out 0.45s forwards;
+}
+@keyframes threadFade {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 @keyframes threadAppear {

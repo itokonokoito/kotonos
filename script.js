@@ -99,6 +99,15 @@ function renderBlocks() {
             tile.classList.add("correct");
         }
 
+        if (block.justCorrect) {
+            tile.classList.add("just-correct");
+
+            setTimeout(() => {
+                block.justCorrect = false;
+                renderBlocks();
+            }, 800);
+        }
+
         if (block.type === "complete") {
            tile.classList.add("complete");
         }
@@ -405,7 +414,8 @@ function mergeBlocksByText() {
         newBlocks.push({
             text: bestText,
             type: isCorrectChunk ? "correct" : blocks[i].type,
-            locked: wasMerged ? false : blocks[i].locked
+            locked: wasMerged ? false : blocks[i].locked,
+            justCorrect: isCorrectChunk && wasMerged
         });
 
         i = bestEnd + 1;
