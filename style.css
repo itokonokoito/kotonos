@@ -109,20 +109,14 @@ body {
 
 .tile.just-correct::before {
     content: "";
-
     position: absolute;
 
-    top: 8px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
+    inset: 0;
 
-    border-radius: 12px;
-
-    border: 5px dashed #ff4040;
+    border-radius: inherit;
+    border: clamp(2px, calc(var(--tile-size, 80px) * 0.06), 5px) dashed #ff4040;
 
     box-sizing: border-box;
-
     pointer-events: none;
 
     box-shadow:
