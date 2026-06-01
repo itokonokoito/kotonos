@@ -672,9 +672,7 @@ hintButton.addEventListener("click", () => {
 });
 
 homeButton.addEventListener("click", () => {
-    location.href =
-        location.origin +
-        location.pathname;
+    window.location.href = "./";
 });
 
 
