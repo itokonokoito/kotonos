@@ -722,6 +722,7 @@ hintButton.addEventListener("click", () => {
         hintLevel++;
     }
 
+
     hintText.innerHTML = availableHints
         .slice(0, hintLevel)
         .map((hint, index) => `ヒント${index + 1}：${hint}`)
