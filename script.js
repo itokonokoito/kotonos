@@ -734,6 +734,9 @@ homeButton.addEventListener("click", () => {
 
 sortButton.addEventListener("click", () => {
 
+    console.log("整理ボタン押された");
+    console.log(blocks.map((block) => block.text));
+
     if (isCompleted) {
         result.textContent =
             "完成済みだよ";
