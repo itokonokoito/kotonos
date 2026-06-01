@@ -2,6 +2,8 @@ let answer = "アナグラム";
 let blocks = [];
 let selectedIndices = [];
 let selectedIndex = null;
+let draggingIndex = null;
+let isDraggingTile = false;
 let hints = [];
 let hintLevel = 0;
 let isCompleted = false;
@@ -87,6 +89,7 @@ function renderBlocks() {
 
         tile.className = "tile";
         tile.textContent = block.text;
+        tile.dataset.index = index;
 
         if (splitText(block.text).length >= 2) {
             tile.classList.add("merged");
@@ -129,28 +132,13 @@ function renderBlocks() {
             selectedIndex = index;
         });
 
-        tile.addEventListener("pointerup", (event) => {
-            if (selectedIndex === null) {
-                return;
-            }
+        tile.addEventListener("pointerdown", (event) => {
+        draggingIndex = index;
+        isDraggingTile = true;
+        selectedIndex = index;
 
-            if (selectedIndex === index) {
-                return;
-            }
-
-            const rect = tile.getBoundingClientRect();
-            const pointerX = event.clientX - rect.left;
-            const isRightSide = pointerX > rect.width / 2;
-
-            let insertIndex = index;
-
-            if (isRightSide) {
-                insertIndex = index + 1;
-            }
-
-            moveBlockToInsertIndex(selectedIndex, insertIndex);
-        });
-
+        tile.setPointerCapture(event.pointerId);
+    });
         letters.appendChild(tile);
     });
 
@@ -191,6 +179,7 @@ function createDropZone(insertIndex) {
     const zone = document.createElement("div");
 
     zone.className = "drop-zone";
+    zone.dataset.insertIndex = insertIndex;
 
     if (selectedIndices.length === 1 || selectedIndex !== null) {
         zone.classList.add("movable");
@@ -225,6 +214,58 @@ function createDropZone(insertIndex) {
 
     letters.appendChild(zone);
 }
+
+document.addEventListener("pointerup", (event) => {
+    if (!isDraggingTile || draggingIndex === null) {
+        return;
+    }
+
+    const element = document.elementFromPoint(
+        event.clientX,
+        event.clientY
+    );
+
+    if (!element) {
+        draggingIndex = null;
+        isDraggingTile = false;
+        return;
+    }
+
+    const tile = element.closest(".tile");
+    const zone = element.closest(".drop-zone");
+
+    if (zone && zone.dataset.insertIndex !== undefined) {
+        const insertIndex = Number(zone.dataset.insertIndex);
+
+        moveBlockToInsertIndex(draggingIndex, insertIndex);
+
+        draggingIndex = null;
+        isDraggingTile = false;
+        return;
+    }
+
+    if (tile && tile.dataset.index !== undefined) {
+        const targetIndex = Number(tile.dataset.index);
+
+        if (targetIndex !== draggingIndex) {
+            const rect = tile.getBoundingClientRect();
+            const pointerX = event.clientX - rect.left;
+            const isRightSide = pointerX > rect.width / 2;
+
+            let insertIndex = targetIndex;
+
+            if (isRightSide) {
+                insertIndex = targetIndex + 1;
+            }
+
+            moveBlockToInsertIndex(draggingIndex, insertIndex);
+        }
+    }
+
+    draggingIndex = null;
+    isDraggingTile = false;
+});
+
 function handleTileClick(index) {
     if (selectedIndices.includes(index)) {
         selectedIndices = selectedIndices.filter((i) => i !== index);

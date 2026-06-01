@@ -84,6 +84,8 @@ body {
     cursor: pointer;
     user-select: none;
 
+    touch-action: none;
+
     line-height: 1.2;
     text-align: center;
 
@@ -203,6 +205,7 @@ body {
     user-select: none;
 
     cursor: pointer;
+    touch-action: none;
     transition: 0.15s;
 }
 
