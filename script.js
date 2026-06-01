@@ -15,6 +15,7 @@ const hintButton = document.getElementById("hintButton");
 const hintText = document.getElementById("hintText");
 const letters = document.getElementById("letters");
 const checkButton = document.getElementById("checkButton");
+const homeButton = document.getElementById("homeButton");
 const result = document.getElementById("result");
 const difficultySelect = document.getElementById("difficultySelect");
 const puzzleInfo = document.getElementById("puzzleInfo");
@@ -670,6 +671,11 @@ hintButton.addEventListener("click", () => {
         .join("<br>");
 });
 
+homeButton.addEventListener("click", () => {
+    location.href =
+        location.origin +
+        location.pathname;
+});
 
 
 const params = new URLSearchParams(location.search);
