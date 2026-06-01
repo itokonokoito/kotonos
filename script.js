@@ -87,7 +87,6 @@ function renderBlocks() {
 
         tile.className = "tile";
         tile.textContent = block.text;
-        tile.draggable = true;
 
         if (splitText(block.text).length >= 2) {
             tile.classList.add("merged");
@@ -111,38 +110,37 @@ function renderBlocks() {
         }
 
         if (block.type === "complete") {
-           tile.classList.add("complete");
+            tile.classList.add("complete");
         }
 
         if (selectedIndices.includes(index)) {
             tile.classList.add("selected");
         }
+
         if (block.locked) {
-           tile.classList.add("locked");
+            tile.classList.add("locked");
         }
 
         tile.addEventListener("click", () => {
             handleTileClick(index);
         });
 
-        tile.addEventListener("dragstart", () => {
+        tile.addEventListener("pointerdown", () => {
             selectedIndex = index;
         });
 
-        tile.addEventListener("dragover", (event) => {
-            event.preventDefault();
-        });
-
-        tile.addEventListener("drop", (event) => {
-            event.preventDefault();
-
+        tile.addEventListener("pointerup", (event) => {
             if (selectedIndex === null) {
                 return;
             }
 
+            if (selectedIndex === index) {
+                return;
+            }
+
             const rect = tile.getBoundingClientRect();
-            const dropX = event.clientX - rect.left;
-            const isRightSide = dropX > rect.width / 2;
+            const pointerX = event.clientX - rect.left;
+            const isRightSide = pointerX > rect.width / 2;
 
             let insertIndex = index;
 
@@ -150,22 +148,7 @@ function renderBlocks() {
                 insertIndex = index + 1;
             }
 
-            const movingBlock = blocks.splice(selectedIndex, 1)[0];
-
-            let targetIndex = insertIndex;
-
-            if (selectedIndex < insertIndex) {
-                targetIndex--;
-            }
-
-            blocks.splice(targetIndex, 0, movingBlock);
-            moveCount++;
-
-            selectedIndex = null;
-            selectedIndices = [];
-
-            renderBlocks();
-            applyAutoMergeIfNeeded();
+            moveBlockToInsertIndex(selectedIndex, insertIndex);
         });
 
         letters.appendChild(tile);
@@ -176,53 +159,15 @@ function renderBlocks() {
     updatePuzzleInfo();
 }
 
-
-function createDropZone(insertIndex) {
-    const zone = document.createElement("div");
-
-    zone.className = "drop-zone";
-
-    if (selectedIndices.length === 1) {
-    zone.classList.add("movable");
-    }
-
-    zone.addEventListener("dragover", (event) => {
-        event.preventDefault();
-        zone.classList.add("active");
-    });
-
-    zone.addEventListener("dragleave", () => {
-        zone.classList.remove("active");
-    });
-
-    zone.addEventListener("drop", (event) => {
-        event.preventDefault();
-
-        if (selectedIndex === null) {
-            return;
-        }
-
-        const movingBlock = blocks.splice(selectedIndex, 1)[0];
-
-        let targetIndex = insertIndex;
-
-        if (selectedIndex < insertIndex) {
-            targetIndex--;
-        }
-
-        blocks.splice(targetIndex, 0, movingBlock);
-        moveCount++;
-
-        selectedIndex = null;
-        renderBlocks();
-    });
-    zone.addEventListener("click", () => {
-
-    if (selectedIndices.length !== 1) {
+function moveBlockToInsertIndex(movingIndex, insertIndex) {
+    if (movingIndex === null) {
         return;
     }
 
-    const movingIndex = selectedIndices[0];
+    if (movingIndex < 0 || movingIndex >= blocks.length) {
+        return;
+    }
+
     const movingBlock = blocks.splice(movingIndex, 1)[0];
 
     let targetIndex = insertIndex;
@@ -231,18 +176,55 @@ function createDropZone(insertIndex) {
         targetIndex--;
     }
 
-        blocks.splice(targetIndex, 0, movingBlock);
+    blocks.splice(targetIndex, 0, movingBlock);
 
-        selectedIndices = [];
-        selectedIndex = null;
+    moveCount++;
 
-        renderBlocks();
-        applyAutoMergeIfNeeded();
+    selectedIndex = null;
+    selectedIndices = [];
+
+    renderBlocks();
+    applyAutoMergeIfNeeded();
+}
+
+function createDropZone(insertIndex) {
+    const zone = document.createElement("div");
+
+    zone.className = "drop-zone";
+
+    if (selectedIndices.length === 1 || selectedIndex !== null) {
+        zone.classList.add("movable");
+    }
+
+    zone.addEventListener("pointerenter", () => {
+        zone.classList.add("active");
+    });
+
+    zone.addEventListener("pointerleave", () => {
+        zone.classList.remove("active");
+    });
+
+    zone.addEventListener("pointerup", () => {
+        if (selectedIndex !== null) {
+            moveBlockToInsertIndex(selectedIndex, insertIndex);
+            return;
+        }
+
+        if (selectedIndices.length === 1) {
+            moveBlockToInsertIndex(selectedIndices[0], insertIndex);
+        }
+    });
+
+    zone.addEventListener("click", () => {
+        if (selectedIndices.length !== 1) {
+            return;
+        }
+
+        moveBlockToInsertIndex(selectedIndices[0], insertIndex);
     });
 
     letters.appendChild(zone);
 }
-
 function handleTileClick(index) {
     if (selectedIndices.includes(index)) {
         selectedIndices = selectedIndices.filter((i) => i !== index);
