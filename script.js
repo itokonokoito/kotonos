@@ -16,6 +16,7 @@ const hintText = document.getElementById("hintText");
 const letters = document.getElementById("letters");
 const checkButton = document.getElementById("checkButton");
 const homeButton = document.getElementById("homeButton");
+const sortButton = document.getElementById("sortButton");
 const result = document.getElementById("result");
 const difficultySelect = document.getElementById("difficultySelect");
 const puzzleInfo = document.getElementById("puzzleInfo");
@@ -288,6 +289,62 @@ function updateTileSize() {
 
     document.documentElement.style.setProperty("--tile-size", `${size}px`);
     document.documentElement.style.setProperty("--tile-font-size", `${Math.floor(size * 0.45)}px`);
+}
+
+function getBlockType(block) {
+    const text = block.text;
+
+    if (/^\p{Script=Hiragana}+$/u.test(text)) {
+        return "hiragana";
+    }
+
+    if (/^\p{Script=Katakana}+$/u.test(text)) {
+        return "katakana";
+    }
+
+    if (/^\p{Script=Han}+$/u.test(text)) {
+        return "kanji";
+    }
+
+    if (/^[a-zA-Z0-9]+$/.test(text)) {
+        return "alnum";
+    }
+
+    if (/\p{Emoji}/u.test(text)) {
+        return "emoji";
+    }
+
+    return "other";
+}
+
+function sortBlocksByType() {
+
+    const typeOrder = {
+        hiragana: 1,
+        katakana: 2,
+        kanji: 3,
+        alnum: 4,
+        emoji: 5,
+        other: 6
+    };
+
+    blocks.sort((a, b) => {
+        return (
+            typeOrder[getBlockType(a)]
+            -
+            typeOrder[getBlockType(b)]
+        );
+    });
+
+    selectedIndex = null;
+    selectedIndices = [];
+
+    moveCount++;
+
+    renderBlocks();
+
+    result.textContent =
+        "種類ごとに整理したよ";
 }
 
 function updatePuzzleInfo() {
@@ -675,6 +732,16 @@ homeButton.addEventListener("click", () => {
     window.location.href = "./";
 });
 
+sortButton.addEventListener("click", () => {
+
+    if (isCompleted) {
+        result.textContent =
+            "完成済みだよ";
+        return;
+    }
+
+    sortBlocksByType();
+});
 
 const params = new URLSearchParams(location.search);
 const q = params.get("q");
