@@ -4,10 +4,12 @@ let selectedIndices = [];
 let selectedIndex = null;
 let draggingIndex = null;
 let isDraggingTile = false;
+let draggingElement = null;
 let hints = [];
 let hintLevel = 0;
 let isCompleted = false;
 let moveCount = 0;
+
 
 const tileSizeSlider = document.getElementById("tileSizeSlider");
 const hint1Input = document.getElementById("hint1Input");
@@ -136,11 +138,13 @@ function renderBlocks() {
         draggingIndex = index;
         isDraggingTile = true;
         selectedIndex = index;
+        draggingElement = tile;
 
+        tile.classList.add("dragging");
         tile.setPointerCapture(event.pointerId);
-    });
+        });
         letters.appendChild(tile);
-    });
+        });
 
     createDropZone(blocks.length);
 
@@ -264,6 +268,11 @@ document.addEventListener("pointerup", (event) => {
 
     draggingIndex = null;
     isDraggingTile = false;
+    if (draggingElement) {
+    draggingElement.classList.remove("dragging");
+    draggingElement = null;
+    }
+
 });
 
 function handleTileClick(index) {
