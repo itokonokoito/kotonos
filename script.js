@@ -686,8 +686,8 @@ checkButton.addEventListener("click", () => {
 manualMergeButton.addEventListener("click", () => {
 
     if (isCompleted) {
-    result.textContent = "完成済みだよ";
-    return;
+        result.textContent = "完成済みだよ";
+        return;
     }
 
     if (selectedIndices.length !== 2) {
@@ -695,29 +695,36 @@ manualMergeButton.addEventListener("click", () => {
         return;
     }
 
-    const sorted = [...selectedIndices].sort((a, b) => a - b);
-    const leftIndex = sorted[0];
-    const rightIndex = sorted[1];
+    const firstIndex = selectedIndices[0];
+    const secondIndex = selectedIndices[1];
 
-    if (rightIndex !== leftIndex + 1) {
-        result.textContent = "隣り合ったブロックだけつむげるよ";
+    if (firstIndex === secondIndex) {
+        result.textContent = "別々のブロックを2つ選んでね";
         return;
     }
 
-    const leftBlock = blocks[leftIndex];
-    const rightBlock = blocks[rightIndex];
+    const firstBlock = blocks[firstIndex];
+    const secondBlock = blocks[secondIndex];
 
     const mergedBlock = {
-        text: leftBlock.text + rightBlock.text,
+        text: firstBlock.text + secondBlock.text,
         type: "manual"
     };
 
-    blocks.splice(leftIndex, 2, mergedBlock);
+    const newBlocks = blocks.filter((block, index) => {
+        return index !== firstIndex && index !== secondIndex;
+    });
+
+    const insertIndex = Math.min(firstIndex, newBlocks.length);
+
+    newBlocks.splice(insertIndex, 0, mergedBlock);
+
+    blocks = newBlocks;
 
     selectedIndices = [];
     selectedIndex = null;
 
-    result.textContent = "手動でつむいだよ";
+    result.textContent = "選んだ順番でつむいだよ";
 
     renderBlocks();
 });
