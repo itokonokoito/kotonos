@@ -5,6 +5,10 @@ let selectedIndex = null;
 let draggingIndex = null;
 let isDraggingTile = false;
 let draggingElement = null;
+let dragStartX = 0;
+let dragStartY = 0;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
 let hints = [];
 let hintLevel = 0;
 let isCompleted = false;
@@ -140,10 +144,26 @@ function renderBlocks() {
         selectedIndex = index;
         draggingElement = tile;
 
+        const rect = tile.getBoundingClientRect();
+
+        dragStartX = event.clientX;
+        dragStartY = event.clientY;
+        dragOffsetX = event.clientX - rect.left;
+        dragOffsetY = event.clientY - rect.top;
+
         tile.classList.add("dragging");
+
+        tile.style.position = "fixed";
+        tile.style.left = `${event.clientX - dragOffsetX}px`;
+        tile.style.top = `${event.clientY - dragOffsetY}px`;
+        tile.style.width = `${rect.width}px`;
+        tile.style.height = `${rect.height}px`;
+
         tile.setPointerCapture(event.pointerId);
         });
-        letters.appendChild(tile);
+
+
+    letters.appendChild(tile);
         });
 
     createDropZone(blocks.length);
@@ -219,6 +239,19 @@ function createDropZone(insertIndex) {
     letters.appendChild(zone);
 }
 
+document.addEventListener("pointermove", (event) => {
+    if (!isDraggingTile || !draggingElement) {
+        return;
+    }
+
+    draggingElement.style.left =
+        `${event.clientX - dragOffsetX}px`;
+
+    draggingElement.style.top =
+        `${event.clientY - dragOffsetY}px`;
+});
+
+
 document.addEventListener("pointerup", (event) => {
     if (!isDraggingTile || draggingIndex === null) {
         return;
@@ -270,6 +303,13 @@ document.addEventListener("pointerup", (event) => {
     isDraggingTile = false;
     if (draggingElement) {
     draggingElement.classList.remove("dragging");
+
+    draggingElement.style.position = "";
+    draggingElement.style.left = "";
+    draggingElement.style.top = "";
+    draggingElement.style.width = "";
+    draggingElement.style.height = "";
+
     draggingElement = null;
     }
 
