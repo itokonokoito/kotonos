@@ -257,6 +257,17 @@ body {
 .drop-zone.movable::before {
     background: rgba(120, 200, 255, 0.7);
 }
+.drop-zone.nearest {
+    background: rgba(120, 200, 255, 0.16);
+}
+
+.drop-zone.nearest::before {
+    background: rgba(120, 200, 255, 1);
+    height: 64px;
+    box-shadow:
+        0 0 6px rgba(120, 200, 255, 0.9),
+        0 0 14px rgba(120, 200, 255, 0.45);
+}
 
 #puzzleInfo {
     margin-top: 16px;

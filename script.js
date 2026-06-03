@@ -14,6 +14,7 @@ let hints = [];
 let hintLevel = 0;
 let isCompleted = false;
 let moveCount = 0;
+let currentNearestZone = null;
 
 
 const tileSizeSlider = document.getElementById("tileSizeSlider");
@@ -181,6 +182,31 @@ function renderBlocks() {
     updatePuzzleInfo();
 }
 
+function findNearestDropZone(x, y) {
+    const dropZones = [...document.querySelectorAll(".drop-zone")];
+
+    let nearestZone = null;
+    let nearestDistance = Infinity;
+
+    dropZones.forEach((zone) => {
+        const rect = zone.getBoundingClientRect();
+
+        const zoneCenterX = rect.left + rect.width / 2;
+        const zoneCenterY = rect.top + rect.height / 2;
+
+        const distance =
+            Math.abs(x - zoneCenterX) +
+            Math.abs(y - zoneCenterY);
+
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestZone = zone;
+        }
+    });
+
+    return nearestZone;
+}
+
 function moveBlockToInsertIndex(movingIndex, insertIndex) {
     if (movingIndex === null) {
         return;
@@ -271,6 +297,21 @@ document.addEventListener("pointermove", (event) => {
 
     draggingElement.style.top =
         `${event.clientY - dragOffsetY}px`;
+
+    const nearestZone = findNearestDropZone(
+        event.clientX,
+        event.clientY
+    );
+
+    if (currentNearestZone && currentNearestZone !== nearestZone) {
+        currentNearestZone.classList.remove("nearest");
+    }
+
+    if (nearestZone) {
+        nearestZone.classList.add("nearest");
+    }
+
+    currentNearestZone = nearestZone;
 });
 
 document.addEventListener("pointerup", (event) => {
@@ -278,26 +319,10 @@ document.addEventListener("pointerup", (event) => {
         return;
     }
 
-    const dropZones = [...document.querySelectorAll(".drop-zone")];
-
-    let nearestZone = null;
-    let nearestDistance = Infinity;
-
-    dropZones.forEach((zone) => {
-        const rect = zone.getBoundingClientRect();
-
-        const zoneCenterX = rect.left + rect.width / 2;
-        const zoneCenterY = rect.top + rect.height / 2;
-
-        const distance =
-            Math.abs(event.clientX - zoneCenterX) +
-            Math.abs(event.clientY - zoneCenterY);
-
-        if (distance < nearestDistance) {
-            nearestDistance = distance;
-            nearestZone = zone;
-        }
-    });
+    const nearestZone = findNearestDropZone(
+    event.clientX,
+    event.clientY
+    );
 
     if (nearestZone && nearestZone.dataset.insertIndex !== undefined) {
         const insertIndex = Number(nearestZone.dataset.insertIndex);
@@ -319,6 +344,13 @@ document.addEventListener("pointerup", (event) => {
 
         draggingElement = null;
     }
+
+        if (currentNearestZone) {
+        currentNearestZone.classList.remove("nearest");
+        currentNearestZone = null;
+    }
+
+    
 });
 
 function handleTileClick(index) {
