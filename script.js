@@ -55,6 +55,20 @@ function encodeAnswer(text) {
     return btoa(unescape(encodeURIComponent(text)));
 }
 
+function encodePuzzleData(data) {
+    const json = JSON.stringify(data);
+    return LZString.compressToEncodedURIComponent(json);
+}
+
+function decodePuzzleData(text) {
+    const json = LZString.decompressFromEncodedURIComponent(text);
+    return JSON.parse(json);
+}
+
+function isValidMode(mode) {
+    return mode === "easy" || mode === "normal" || mode === "hard";
+}
+
 function decodeAnswer(encodedText) {
     return decodeURIComponent(escape(atob(encodedText)));
 }
@@ -782,22 +796,30 @@ shareButton.addEventListener("click", () => {
         return;
     }
 
-    const encodedAnswer = encodeAnswer(inputText);
     const hintList = [
-          hint1Input.value.trim(),
-    hint2Input.value.trim(),
-          hint3Input.value.trim()
-];
+        hint1Input.value.trim(),
+        hint2Input.value.trim(),
+        hint3Input.value.trim()
+    ].filter((hint) => hint !== "");
 
-const encodedHint = encodeAnswer(JSON.stringify(hintList));
+    const puzzleData = {
+        a: inputText
+    };
 
-    const difficulty = difficultySelect.value;
+    if (difficultySelect.value !== "normal") {
+        puzzleData.m = difficultySelect.value;
+    }
+
+    if (hintList.length > 0) {
+        puzzleData.h = hintList;
+    }
+
+    const encodedPuzzle =
+        encodePuzzleData(puzzleData);
 
     const url =
         `${location.origin}${location.pathname}` +
-        `?q=${encodeURIComponent(encodedAnswer)}` +
-        `&mode=${difficulty}` +
-        `&h=${encodeURIComponent(encodedHint)}`;
+        `?p=${encodedPuzzle}`;
 
     shareUrl.value = url;
 
@@ -888,41 +910,70 @@ sortButton.addEventListener("click", () => {
 
     sortBlocksByType();
 });
-
 const params = new URLSearchParams(location.search);
-const q = params.get("q");
 
+const p = params.get("p");
+const q = params.get("q");
 const h = params.get("h");
 const mode = params.get("mode");
 
-if (mode) {
-    difficultySelect.value = mode;
-}
-
-if (q) {
-
-    if (h) {
+if (p) {
     try {
-        hints = JSON.parse(decodeAnswer(h));
+        const puzzleData = decodePuzzleData(p);
+
+        answer = puzzleData.a;
+        hints = Array.isArray(puzzleData.h) ? puzzleData.h : [];
         hintLevel = 0;
-    } catch (error) {
-        hint = "";
-    }
-}
 
-    try {
-        answer = decodeAnswer(q);
+        if (isValidMode(puzzleData.m)) {
+            difficultySelect.value = puzzleData.m;
+        } else {
+            difficultySelect.value = "normal";
+        }
 
         answerInput.value = "";
         answerInput.placeholder = "共有問題を読み込み済み";
 
         document.getElementById("setup").style.display = "none";
-        hint1Input.style.display = "none";
-        hint2Input.style.display = "none";
-        hint3Input.style.display = "none";
         shareButton.style.display = "none";
         shareUrl.style.display = "none";
         copyButton.style.display = "none";
+
+        hint1Input.style.display = "none";
+        hint2Input.style.display = "none";
+        hint3Input.style.display = "none";
+
+        result.textContent = "共有問題を読み込んだよ";
+    } catch (error) {
+        result.textContent = "共有URLの読み込みに失敗したよ";
+    }
+} else if (q) {
+    // 旧URL用：前の q=... 形式も一応読めるように残す
+    try {
+        answer = decodeAnswer(q);
+        answerInput.value = "";
+        answerInput.placeholder = "共有問題を読み込み済み";
+
+        if (h) {
+            try {
+                hints = JSON.parse(decodeAnswer(h));
+            } catch (error) {
+                hints = [];
+            }
+        }
+
+        if (isValidMode(mode)) {
+            difficultySelect.value = mode;
+        }
+
+        document.getElementById("setup").style.display = "none";
+        shareButton.style.display = "none";
+        shareUrl.style.display = "none";
+        copyButton.style.display = "none";
+
+        hint1Input.style.display = "none";
+        hint2Input.style.display = "none";
+        hint3Input.style.display = "none";
 
         result.textContent = "共有問題を読み込んだよ";
     } catch (error) {
