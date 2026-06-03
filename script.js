@@ -220,6 +220,18 @@ function moveBlockToInsertIndex(movingIndex, insertIndex) {
         targetIndex = blocks.length;
     }
 
+    // 同じ位置に戻しただけなら、手数を増やさない
+    if (targetIndex === movingIndex) {
+        blocks.splice(movingIndex, 0, movingBlock);
+
+        selectedIndex = null;
+        selectedIndices = [];
+
+        renderBlocks();
+
+        return;
+    }
+
     justMovedId++;
 
     movingBlock.justMoved = justMovedId;
