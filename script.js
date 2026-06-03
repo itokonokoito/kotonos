@@ -142,10 +142,6 @@ function renderBlocks() {
             }, 500);
         }
 
-        tile.addEventListener("click", () => {
-            handleTileClick(index);
-        });
-
         tile.addEventListener("pointerdown", (event) => {
             draggingIndex = index;
             isDraggingTile = false;
@@ -354,6 +350,8 @@ document.addEventListener("pointerup", (event) => {
         }
 
         if (!isDraggingTile) {
+            handleTileClick(draggingIndex);
+
             draggingIndex = null;
             draggingElement = null;
             return;
