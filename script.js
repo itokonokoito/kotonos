@@ -8,6 +8,7 @@ let draggingElement = null;
 let justMovedId = 0;
 let dragStartX = 0;
 let dragStartY = 0;
+let dragThreshold = 8;
 let dragOffsetX = 0;
 let dragOffsetY = 0;
 let hints = [];
@@ -145,9 +146,25 @@ function renderBlocks() {
             handleTileClick(index);
         });
 
-        tile.addEventListener("pointerdown", () => {
+        tile.addEventListener("pointerdown", (event) => {
+            draggingIndex = index;
+            isDraggingTile = false;
             selectedIndex = index;
+            draggingElement = tile;
+
+            const rect = tile.getBoundingClientRect();
+
+            dragStartX = event.clientX;
+            dragStartY = event.clientY;
+            dragOffsetX = event.clientX - rect.left;
+            dragOffsetY = event.clientY - rect.top;
+
+            tile.dataset.dragWidth = rect.width;
+            tile.dataset.dragHeight = rect.height;
+
+            tile.setPointerCapture(event.pointerId);
         });
+
 
         tile.addEventListener("pointerdown", (event) => {
         draggingIndex = index;
@@ -288,8 +305,25 @@ function createDropZone(insertIndex) {
 }
 
 document.addEventListener("pointermove", (event) => {
-    if (!isDraggingTile || !draggingElement) {
+    if (draggingIndex === null || !draggingElement) {
         return;
+    }
+
+    const moveX = Math.abs(event.clientX - dragStartX);
+    const moveY = Math.abs(event.clientY - dragStartY);
+
+    if (!isDraggingTile) {
+        if (moveX < dragThreshold && moveY < dragThreshold) {
+            return;
+        }
+
+        isDraggingTile = true;
+
+        draggingElement.classList.add("dragging");
+
+        draggingElement.style.position = "fixed";
+        draggingElement.style.width = `${draggingElement.dataset.dragWidth}px`;
+        draggingElement.style.height = `${draggingElement.dataset.dragHeight}px`;
     }
 
     draggingElement.style.left =
@@ -315,9 +349,15 @@ document.addEventListener("pointermove", (event) => {
 });
 
 document.addEventListener("pointerup", (event) => {
-    if (!isDraggingTile || draggingIndex === null) {
-        return;
-    }
+    if (draggingIndex === null) {
+            return;
+        }
+
+        if (!isDraggingTile) {
+            draggingIndex = null;
+            draggingElement = null;
+            return;
+        }
 
     const nearestZone = findNearestDropZone(
     event.clientX,
@@ -350,7 +390,7 @@ document.addEventListener("pointerup", (event) => {
         currentNearestZone = null;
     }
 
-    
+
 });
 
 function handleTileClick(index) {
