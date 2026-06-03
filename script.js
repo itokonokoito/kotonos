@@ -5,6 +5,7 @@ let selectedIndex = null;
 let draggingIndex = null;
 let isDraggingTile = false;
 let draggingElement = null;
+let justMovedId = 0;
 let dragStartX = 0;
 let dragStartY = 0;
 let dragOffsetX = 0;
@@ -130,6 +131,15 @@ function renderBlocks() {
             tile.classList.add("locked");
         }
 
+        if (block.justMoved === justMovedId) {
+            tile.classList.add("just-moved");
+
+            setTimeout(() => {
+                block.justMoved = null;
+                renderBlocks();
+            }, 500);
+        }
+
         tile.addEventListener("click", () => {
             handleTileClick(index);
         });
@@ -187,6 +197,18 @@ function moveBlockToInsertIndex(movingIndex, insertIndex) {
     if (movingIndex < insertIndex) {
         targetIndex--;
     }
+
+    if (targetIndex < 0) {
+        targetIndex = 0;
+    }
+
+    if (targetIndex > blocks.length) {
+        targetIndex = blocks.length;
+    }
+
+    justMovedId++;
+
+    movingBlock.justMoved = justMovedId;
 
     blocks.splice(targetIndex, 0, movingBlock);
 
@@ -251,68 +273,52 @@ document.addEventListener("pointermove", (event) => {
         `${event.clientY - dragOffsetY}px`;
 });
 
-
 document.addEventListener("pointerup", (event) => {
     if (!isDraggingTile || draggingIndex === null) {
         return;
     }
 
-    const element = document.elementFromPoint(
-        event.clientX,
-        event.clientY
-    );
+    const dropZones = [...document.querySelectorAll(".drop-zone")];
 
-    if (!element) {
-        draggingIndex = null;
-        isDraggingTile = false;
-        return;
-    }
+    let nearestZone = null;
+    let nearestDistance = Infinity;
 
-    const tile = element.closest(".tile");
-    const zone = element.closest(".drop-zone");
+    dropZones.forEach((zone) => {
+        const rect = zone.getBoundingClientRect();
 
-    if (zone && zone.dataset.insertIndex !== undefined) {
-        const insertIndex = Number(zone.dataset.insertIndex);
+        const zoneCenterX = rect.left + rect.width / 2;
+        const zoneCenterY = rect.top + rect.height / 2;
+
+        const distance =
+            Math.abs(event.clientX - zoneCenterX) +
+            Math.abs(event.clientY - zoneCenterY);
+
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestZone = zone;
+        }
+    });
+
+    if (nearestZone && nearestZone.dataset.insertIndex !== undefined) {
+        const insertIndex = Number(nearestZone.dataset.insertIndex);
 
         moveBlockToInsertIndex(draggingIndex, insertIndex);
-
-        draggingIndex = null;
-        isDraggingTile = false;
-        return;
-    }
-
-    if (tile && tile.dataset.index !== undefined) {
-        const targetIndex = Number(tile.dataset.index);
-
-        if (targetIndex !== draggingIndex) {
-            const rect = tile.getBoundingClientRect();
-            const pointerX = event.clientX - rect.left;
-            const isRightSide = pointerX > rect.width / 2;
-
-            let insertIndex = targetIndex;
-
-            if (isRightSide) {
-                insertIndex = targetIndex + 1;
-            }
-
-            moveBlockToInsertIndex(draggingIndex, insertIndex);
-        }
     }
 
     draggingIndex = null;
     isDraggingTile = false;
+
     if (draggingElement) {
-    draggingElement.classList.remove("dragging");
+        draggingElement.classList.remove("dragging");
 
-    draggingElement.style.position = "";
-    draggingElement.style.left = "";
-    draggingElement.style.top = "";
-    draggingElement.style.width = "";
-    draggingElement.style.height = "";
+        draggingElement.style.position = "";
+        draggingElement.style.left = "";
+        draggingElement.style.top = "";
+        draggingElement.style.width = "";
+        draggingElement.style.height = "";
 
-    draggingElement = null;
+        draggingElement = null;
     }
-
 });
 
 function handleTileClick(index) {
