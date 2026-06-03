@@ -162,31 +162,6 @@ function renderBlocks() {
         });
 
 
-        tile.addEventListener("pointerdown", (event) => {
-        draggingIndex = index;
-        isDraggingTile = true;
-        selectedIndex = index;
-        draggingElement = tile;
-
-        const rect = tile.getBoundingClientRect();
-
-        dragStartX = event.clientX;
-        dragStartY = event.clientY;
-        dragOffsetX = event.clientX - rect.left;
-        dragOffsetY = event.clientY - rect.top;
-
-        tile.classList.add("dragging");
-
-        tile.style.position = "fixed";
-        tile.style.left = `${event.clientX - dragOffsetX}px`;
-        tile.style.top = `${event.clientY - dragOffsetY}px`;
-        tile.style.width = `${rect.width}px`;
-        tile.style.height = `${rect.height}px`;
-
-        tile.setPointerCapture(event.pointerId);
-        });
-
-
     letters.appendChild(tile);
         });
 
